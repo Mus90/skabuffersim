@@ -1,0 +1,9 @@
+cmake_minimum_required(VERSION 3.4)
+project(sdpbuffer)
+
+include_directories(src SyDEVSbase)
+
+set(SOURCE_FILES
+	main.cpp)
+	
+CMakeLists.txt
