@@ -4,3 +4,6 @@ skabuffer: main.o
 
 main.o: main.cpp building_sdp_processor.h building_sdp_buffer.h building_sdp_subscription_scheduler.h  building_ska_data_delivery.h skabuffer.h
 	g++ -I../../sydevs/src/ -c main.cpp
+
+clean:
+	rm *.o skabuffer
