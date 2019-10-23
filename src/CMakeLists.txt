@@ -1,3 +1,6 @@
+# this file is not ready for use yet.
+# use the supplied Makefile for now.
+
 cmake_minimum_required(VERSION 3.5)
 project(sdpbuffer)
 
