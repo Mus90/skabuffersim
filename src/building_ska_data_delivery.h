@@ -27,7 +27,7 @@ class building_ska_delivery : public composite_node {
  
 inline building_ska_delivery::building_ska_delivery(const std::string& node_name, const node_context& external_context) : composite_node(node_name, external_context),
   _processor("processor", internal_context()),
-  _buffer("burrer", internal_context()),
+  _buffer("buffer", internal_context()),
   _subscription_sched("subscription_scheduler", internal_context()) {
 
   inner_link(_processor._buffer_rate_change_output,

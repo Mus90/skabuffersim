@@ -49,7 +49,7 @@ inline duration sdp_buffer_node::unplanned_event(duration elapsed_dt)
     // In this case have received a message from the processor.
     int64 rate_change = _processor_rate_change_input.value();
 
-    std::cout << "  recieved rate chate : " << rate_change << std::endl;
+    std::cout << "  recieved rate change : " << rate_change << std::endl;
 
     // Should now adjust internal state and perform any actions to do with LTS.
   }
