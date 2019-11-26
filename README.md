@@ -1,4 +1,4 @@
-# skabuffersim
+## skabuffersim
 
 To build you need to have the syDEVS build tree in the directory one level below the directory that the skabuffersim files are in and will need to have built at least the static syDEVS library.
 
