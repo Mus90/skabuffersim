@@ -59,7 +59,7 @@ inline duration sdp_processor_node::planned_event(duration elapsed_dt)
   _buffer_rate_change_output.send(drand48()*100); 
 
   // Should now return the time that the next rate change will be made.
-  // Just putting this node to sleep for now.
+  // Just putting this node to sleep for now...
 
   return elapsed_dt + duration(int64(1000), time_precision());
 }
