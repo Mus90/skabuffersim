@@ -23,7 +23,17 @@ class sdp_buffer_node : public atomic_node {
     virtual duration initialization_event();
     virtual duration unplanned_event(duration elapsed_dt);
     virtual duration planned_event(duration elapsed_dt);
-    virtual void finalization_event(duration elapsed_dt);  
+    virtual void finalization_event(duration elapsed_dt);
+
+ private:
+    // Add the size of the buffer
+    int64 _max_size;
+    
+    // Add the current utilization of the buffer.
+    int64 _current_utilization;
+
+    // The rate that data flows to the LTS.
+    int64 _rate_to_lts;
 };
 
 
@@ -31,7 +41,11 @@ inline sdp_buffer_node::sdp_buffer_node(const std::string& node_name, const node
   _processor_rate_change_input("processor_stream", external_interface()),
   _data_request_input("request_input", external_interface()) {
 
-}
+  _max_size = 400000;
+  _current_utilization = 0;
+  _rate_to_lts = 40;
+
+ }
 
 inline duration sdp_buffer_node::initialization_event()
 {
@@ -45,6 +59,10 @@ inline duration sdp_buffer_node::unplanned_event(duration elapsed_dt)
   // Remove once system is debugged.
   std::cout << "sdp_buffer_node::unplanned_event" << std::endl;
 
+  // Caculate the current utilization based on the time now and the
+  // rate that data is going to lts
+  
+  
   if( _processor_rate_change_input.received() ) {
     // In this case have received a message from the processor.
     int64 rate_change = _processor_rate_change_input.value();
@@ -68,6 +86,10 @@ inline duration sdp_buffer_node::planned_event(duration elapsed_dt)
 {
   
   std::cout << "sdp_buffer_node::planned_event" << std::endl;
+
+  // Caculate the current utilization based on the time now and the
+  // rate that data is going to lts
+  
   return duration::inf();
 }
 
