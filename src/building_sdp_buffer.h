@@ -61,13 +61,24 @@ inline duration sdp_buffer_node::unplanned_event(duration elapsed_dt)
 
   // Caculate the current utilization based on the time now and the
   // rate that data is going to lts
-  
-  
+  if (_current_utilization > 2*_rate_to_lts) { 
+      //TODO: in the above if statement, you to decide if you're going to send to lts
+      //questions; do have enough data to send? how much will you send?
+      _current_utilization -= _rate_to_lts;
+  }
+
+
   if( _processor_rate_change_input.received() ) {
     // In this case have received a message from the processor.
     int64 rate_change = _processor_rate_change_input.value();
 
-    std::cout << "  recieved rate chate : " << rate_change << std::endl;
+    if (_current_utilization+rate_change<_max_size){
+        _current_utilization += rate_change;
+    }
+
+  
+    
+    std::cout << "  recieved rate change : " << rate_change << std::endl;
 
     // Should now adjust internal state and perform any actions to do with LTS.
   }
@@ -78,7 +89,7 @@ inline duration sdp_buffer_node::unplanned_event(duration elapsed_dt)
     std::cout << " received request " << requst_val << std::endl;
   }
   
-  
+  std::cout << "  utilization : " << _current_utilization << std::endl;
   return duration::inf();
 }
 

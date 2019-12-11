@@ -59,10 +59,13 @@ inline duration sdp_processor_node::planned_event(duration elapsed_dt)
   // Send message to buffer with rate change value
   // Just using drand48 for how, but should use a distribution
   // appropriate for the simulation.
+
   std::uniform_real_distribution<double>dis(.0, 1.0);
+  _buffer_rate_change_output.send(dis(this->gen)*100);
+
   //std::bernoulli_distribution<double>bernoulli_dis(.0, 1.0);
   //std::normal_distribution<double>normal_dis(.0, 1.0);
-  _buffer_rate_change_output.send(dis(this->gen)*100);
+
   //_buffer_rate_change_output.send(drand48()*100);
 
   // Should now return the time that tne next rate change will be made.
