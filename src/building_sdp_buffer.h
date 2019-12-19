@@ -2,6 +2,8 @@
 
 #include <sydevs/systems/atomic_node.h>
 #include <iostream>
+#include<chrono>
+
 
 namespace skabuffer {
 
@@ -47,6 +49,9 @@ inline sdp_buffer_node::sdp_buffer_node(const std::string& node_name, const node
 
  }
 
+ //get the start time
+auto start =std::chrono::steady_clock::now();
+
 inline duration sdp_buffer_node::initialization_event()
 {
     std::cout << "sdp_buffer_node::init" << std::endl;
@@ -61,22 +66,27 @@ inline duration sdp_buffer_node::unplanned_event(duration elapsed_dt)
 
   // Caculate the current utilization based on the time now and the
   // rate that data is going to lts
-  if (_current_utilization > 2*_rate_to_lts) { 
-      //TODO: in the above if statement, you to decide if you're going to send to lts
-      //questions; do have enough data to send? how much will you send?
-      _current_utilization -= _rate_to_lts;
-  }
+  
+  //get the end time
+  auto end =std::chrono::steady_clock::now();
+
+  //find the difference
+  double elapsed_time = double (std::chrono::duration_cast <std::chrono::microseconds> (end-start).count());
+
+  //output the elapsed time
+  std::cout<<"Elapsed time : " <<elapsed_time<<std::endl;
+
+  _current_utilization=_rate_to_lts * elapsed_time;
+  std::cout<<"Current utilization : "<< _current_utilization<<std::endl;
+
+
+  
 
 
   if( _processor_rate_change_input.received() ) {
     // In this case have received a message from the processor.
     int64 rate_change = _processor_rate_change_input.value();
 
-    if (_current_utilization+rate_change<_max_size){
-        _current_utilization += rate_change;
-    }
-
-  
     
     std::cout << "  recieved rate change : " << rate_change << std::endl;
 
@@ -89,7 +99,6 @@ inline duration sdp_buffer_node::unplanned_event(duration elapsed_dt)
     std::cout << " received request " << requst_val << std::endl;
   }
   
-  std::cout << "  utilization : " << _current_utilization << std::endl;
   return duration::inf();
 }
 
