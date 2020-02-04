@@ -1,5 +1,4 @@
-#pragma once
-
+#pragma once 
 #include <sydevs/systems/simulation.h>
 #include <iostream>
 

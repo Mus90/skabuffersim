@@ -4,7 +4,7 @@
 #include "building_sdp_subscription_scheduler.h"
 #include "building_sdp_processor.h"
 #include "building_sdp_buffer.h"
-
+#include "building_sdp_lts.h"
 
 
 namespace skabuffer {
@@ -22,26 +22,26 @@ class building_ska_delivery : public composite_node {
   sdp_processor_node _processor;
   sdp_buffer_node _buffer;
   sdp_subscription_node _subscription_sched;
+  sdp_lts_node _lts;
 };
 
  
 inline building_ska_delivery::building_ska_delivery(const std::string& node_name, const node_context& external_context) : composite_node(node_name, external_context),
-  _processor("processor", internal_context()),
-  _buffer("buffer", internal_context()),
-  _subscription_sched("subscription_scheduler", internal_context()) {
-
-  inner_link(_processor._buffer_rate_change_output,
-	     _buffer._processor_rate_change_input);
-  inner_link(_subscription_sched._buffer_request_output,
-	     _buffer._data_request_input );
-  
-}
+	_processor("processor", internal_context()),
+	_buffer("buffer", internal_context()),
+	_subscription_sched("subscription_scheduler", internal_context()),
+	_lts("Long Term Storage", internal_context()) {
+	
+	inner_link(_processor._buffer_rate_change_output,
+			   _buffer._processor_rate_change_input);
+	inner_link(_subscription_sched._buffer_request_output,
+			   _buffer._data_request_input);
+	inner_link(_buffer._lts_output,
+			   _lts._data_input);
+ }
 
 
 building_ska_delivery::~building_ska_delivery() {
-
-
 }
- 
- 
+  
 }
