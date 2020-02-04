@@ -68,18 +68,10 @@ inline duration sdp_buffer_node::initialization_event()
 
 
  
-//get the start time
-// XXX - if you did want to get the start time this would be called in
-// a function, but this is a simulatation, so don't know why atyou want this.
-auto start = std::chrono::steady_clock::now();
-
-
-
 inline duration sdp_buffer_node::unplanned_event(duration elapsed_dt)
 {
 	// Remove once system is debugged.
 	std::cout << "sdp_buffer_node::unplanned_event " << elapsed_dt << std::endl;
-
 
 	if( _processor_rate_change_input.received() ) {
 		// In this case have received a message from the processor.
