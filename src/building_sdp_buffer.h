@@ -19,7 +19,8 @@ class sdp_buffer_node : public atomic_node {
   
 	port<message, input, int64> _processor_rate_change_input;
 	port<message, input, int64> _data_request_input;
-  
+
+	port<message, output, int64> _lts_output;
  protected:
     // Event Handlers:
     virtual duration initialization_event();
@@ -38,23 +39,22 @@ class sdp_buffer_node : public atomic_node {
     int64 _rate_to_lts;
 
 	// The current rate from the processor.
-	int64 _rate_from_processor;
+	int64 _rate_from_processor;   
 
-
-
-   
+	duration _last_rate_change_at;
 };
 
 
-inline sdp_buffer_node::sdp_buffer_node(const std::string& node_name, const node_context& external_context) : atomic_node (node_name, external_context) ,
-  _processor_rate_change_input("processor_stream", external_interface()),
-  _data_request_input("request_input", external_interface()) {
-
+inline sdp_buffer_node::sdp_buffer_node(const std::string& node_name, const node_context& external_context) : atomic_node (node_name, external_context),
+	_processor_rate_change_input("processor_stream", external_interface()),
+	_data_request_input("request_input", external_interface()),
+	_lts_output("lts_output", external_interface()){
+	
   _max_size = 400000;
   _current_utilization = 0;
   _rate_to_lts = 40;
   _rate_from_processor = 0;
-  
+  std::cout<<"Current utilization (const): "<< _current_utilization<<std::endl;
  }
 
 
@@ -62,6 +62,7 @@ inline sdp_buffer_node::sdp_buffer_node(const std::string& node_name, const node
 inline duration sdp_buffer_node::initialization_event()
 {
     std::cout << "sdp_buffer_node::init" << std::endl;
+    std::cout<<"Current utilization : "<< _current_utilization<<std::endl;
     return duration::inf();
 }
 
@@ -70,57 +71,50 @@ inline duration sdp_buffer_node::initialization_event()
 //get the start time
 // XXX - if you did want to get the start time this would be called in
 // a function, but this is a simulatation, so don't know why atyou want this.
-
-auto start =std::chrono::steady_clock::now();
+auto start = std::chrono::steady_clock::now();
 
 
 inline duration sdp_buffer_node::unplanned_event(duration elapsed_dt)
 {
 	// Remove once system is debugged.
-	std::cout << "sdp_buffer_node::unplanned_event" << std::endl;
+	std::cout << "sdp_buffer_node::unplanned_event " << elapsed_dt << std::endl;
+
 
 	if( _processor_rate_change_input.received() ) {
 		// In this case have received a message from the processor.
 
 		int64 rate_change = _processor_rate_change_input.value();
+
 		// Caculate the current utilization based on the time now and the
 		// rate that data is going to lts
-         
-		//get the end time
-		// Just need to find look at he increment for his event.
-		auto end =std::chrono::steady_clock::now();
-		//find the difference
-		double elapsed_time = double (std::chrono::duration_cast <std::chrono::microseconds> (end-start).count());
-    
-          //output the elapsed time
-		std::cout<<"Elapsed time : " <<elapsed_time <<std::endl;
-  
-		//		_current_utilization = _current_utilization + (rate_change * elapsed_time) - (_rate_to_lts * elapsed_time);
-		_current_utilization = _current_utilization + (_rate_from_processor * elapsed_time) - (_rate_to_lts * elapsed_time);
-          std::cout<<"Current utilization : "<< _current_utilization<<std::endl;
+		auto time_interval = elapsed_dt - _last_rate_change_at;
+		std::cout << "time interval " << time_interval/_s << std::endl;
+		_current_utilization = _current_utilization + (_rate_from_processor - _rate_to_lts)*time_interval.multiplier();
+		std::cout<<"Current utilization *** : "<< _current_utilization<<std::endl;
         
-          std::cout << "  recieved rate change : " << rate_change << std::endl;
-     // Should now adjust internal state and perform any actions to do with LTS.
+		std::cout << "  recieved rate change : " << rate_change << std::endl;
+		  
+		_rate_from_processor = rate_change;
 
-		  _rate_from_processor = rate_change;
-     }
+		_last_rate_change_at = elapsed_dt;
+	}
     
-
+	
 	if( _data_request_input.received() ) {
 		// Got request from data scheduler.
 		int64 requst_val =  _data_request_input.value();
 
 		std::cout << " received request " << requst_val << std::endl;
 	}
-  
-	return duration::inf();
+	
+	return elapsed_dt;
 }
 
 inline duration sdp_buffer_node::planned_event(duration elapsed_dt)
 {
-  //auto start_2 =std::chrono::steady_clock::now();
+	//auto start_2 =std::chrono::steady_clock::now();
   
-  std::cout << "sdp_buffer_node::planned_event" << std::endl;
+	std::cout << "sdp_buffer_node::planned_event" << std::endl;
 
   // Caculate the current utilization based on the time now and the
   // rate that data is going to lts
@@ -131,7 +125,8 @@ inline duration sdp_buffer_node::planned_event(duration elapsed_dt)
   _current_utilization=_rate_to_lts * elapsed_time_2;
   std::cout<<"Second Current utilization_2 : "<< _current_utilization<<std::endl;
 */
-  return duration::inf();
+
+   return duration::inf();
 }
 
 inline void sdp_buffer_node::finalization_event(duration elapsed_dt)
