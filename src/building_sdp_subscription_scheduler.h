@@ -38,8 +38,12 @@ inline sdp_subscription_node::sdp_subscription_node(const std::string& node_name
  
 inline duration sdp_subscription_node::initialization_event()
 {
+	int64 time_of_first_request;
     std::cout << "sdp_subscription_node::init" << std::endl;
-    return duration(int64(0));
+	
+	time_of_first_request = 0;
+	
+    return duration(time_of_first_request);
 }
 
 
