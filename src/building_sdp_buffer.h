@@ -55,8 +55,6 @@ inline sdp_buffer_node::sdp_buffer_node(const std::string& node_name, const node
   
  }
 
-
-
 inline duration sdp_buffer_node::initialization_event()
 {
     std::cout << "sdp_buffer_node::init" << std::endl;
