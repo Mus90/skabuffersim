@@ -65,13 +65,11 @@ inline duration sdp_buffer_node::initialization_event()
     std::cout<<"Current utilization : "<< _current_utilization<<std::endl;
     return duration::inf();
 }
-
-
  
 inline duration sdp_buffer_node::unplanned_event(duration elapsed_dt)
 {
 	// Remove once system is debugged.
-	std::cout << "sdp_buffer_node::unplanned_event " << elapsed_dt << std::endl;
+	std::cout << "sdp_buffer_node::unplanned_event : " << elapsed_dt << std::endl;
 
 	if( _processor_rate_change_input.received() ) {
 		// In this case have received a message from the processor.
@@ -81,7 +79,7 @@ inline duration sdp_buffer_node::unplanned_event(duration elapsed_dt)
 		// Caculate the current utilization based on the time now and the
 		// rate that data is going to lts
 		auto time_interval = elapsed_dt - _last_rate_change_at;
-		std::cout << "time interval " << time_interval/_s << std::endl;
+		std::cout << "time interval : " << time_interval/_s << std::endl;
 		_current_utilization = _current_utilization + (_rate_from_processor - _rate_to_lts)*time_interval.multiplier();
 		std::cout<<"Current utilization *** : "<< _current_utilization<<std::endl;
         
